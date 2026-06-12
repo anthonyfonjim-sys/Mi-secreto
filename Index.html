@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Universo de Soyin</title>
+    <!-- Tailwind CSS para la interfaz de usuario -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Fuentes de Google para un toque romántico -->
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Dancing+Script:wght@700&family=Montserrat:wght@300;400&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: #050505;
+            font-family: 'Montserrat', sans-serif;
+            color: white;
+            user-select: none;
+        }
+
+        #canvas-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 1;
+        }
+
+        #ui-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10;
+            pointer-events: none; /* Deja pasar los clics al canvas 3D */
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .pointer-events-auto {
+            pointer-events: auto;
+        }
+
+        .title-font {
+            font-family: 'Dancing Script', cursive;
+        }
+
+        .serif-font {
+            font-family: 'Cinzel', serif;
+        }
+
+        /* Tooltip flotante para los sentimientos */
+        #tooltip {
+            position: absolute;
+            background: rgba(255, 215, 0, 0.15);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 215, 0, 0.4);
+            padding: 8px 16px;
+            border-radius: 20px;
+            color: #ffd700;
+            font-family: 'Cinzel', serif;
+            font-size: 1.2rem;
+            pointer-events: none;
+            opacity: 0;
+            transform: translate(-50%, -150%);
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.1);
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+        }
+
+        #tooltip.visible {
+            opacity: 1;
+            transform: translate(-50%, -120%);
+        }
+
+        /* Modal para los detalles de la foto */
+        #detail-modal {
+            background: rgba(10, 10, 15, 0.85);
+            backdrop-filter: blur(15px);
+            border-left: 2px solid rgba(255, 215, 0, 0.3);
+            transform: translateX(100%);
+            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        #detail-modal.open {
+            transform: translateX(0);
+        }
+
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: rgba(0,0,0,0.2); 
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: rgba(255, 215, 0, 0.5); 
+            border-radius: 10px;
+        }
+
+        /* Animación de carga */
+        #loader {
+            transition: opacity 1s ease;
+        }
+
+        /* Botón de música */
+        #music-btn {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(10, 10, 15, 0.7);
+            border: 1px solid rgba(255, 215, 0, 0.4);
+            color: #ffd700;
+            padding: 10px 20px;
+            border-radius: 30px;
+            cursor: pointer;
+            backdrop-filter: blur(5px);
+            transition: all 0.3s ease;
+            z-index: 20;
+            pointer-events: auto;
+            font-family: 'Cinzel', serif;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        #music-btn:hover {
+            background: rgba(255, 215, 0, 0.2);
+            transform: scale(1.05);
+        }
+
+        /* Notificación Toast */
+        #toast {
+            position: absolute;
+            bottom: -50px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(212, 175, 55, 0.9);
+            color: black;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: bold;
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 30;
+            pointer-events: none;
+            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
+        }
+
+        #toast.show {
+            bottom: 20px;
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Pantalla de carga -->
+    <div id="loader" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black pointer-events-auto">
+        <h1 class="title-font text-5xl md:text-7xl text-yellow-400 mb-6 drop-shadow-lg">Para Soyin</h1>
+        <div class="w-16 h-16 border-4 border-yellow-600 border-t-yellow-300 rounded-full animate-spin"></div>
+        <p class="mt-4 text-gray-400 tracking-widest text-sm uppercase">Creando el universo...</p>
+    </div>
+
+    <!-- Contenedor 3D -->
+    <div id="canvas-container"></div>
+
+    <!-- Interfaz de Usuario 2D sobrepuesta -->
+    <div id="ui-layer">
+        
+        <!-- Encabezado -->
+        <header class="p-6 text-center md:text-left drop-shadow-md">
+            <h1 class="title-font text-5xl md:text-6xl text-yellow-300 tracking-wide text-shadow">Universo Soyin</h1>
+            <p class="text-gray-300 mt-2 text-sm md:text-base tracking-widest uppercase">Explora nuestros recuerdos</p>
+        </header>
+
+        <!-- Tooltip que sigue al ratón -->
+        <div id="tooltip">Sentimiento</div>
+
+        <!-- Panel Lateral para Detalles de la Foto -->
+        <div id="detail-modal" class="absolute top-0 right-0 w-full md:w-96 h-full p-6 flex flex-col shadow-2xl pointer-events-auto z-20">
+            <button id="close-btn" class="absolute top-4 right-6 text-gray-400 hover:text-white text-3xl transition-colors">&times;</button>
+            
+            <h2 class="serif-font text-2xl text-yellow-400 mb-6 mt-8 border-b border-yellow-600/30 pb-2">Un Momento Especial</h2>
+            
+            <!-- Imagen en grande -->
+            <div class="w-full h-64 bg-gray-800 rounded-lg overflow-hidden border border-yellow-600/50 shadow-lg relative">
+                <img id="detail-image" src="" alt="Recuerdo" class="w-full h-full object-cover">
+                <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+            </div>
+
+            <div class="mt-4 flex items-center justify-between">
+                <span id="detail-feeling" class="bg-yellow-900/40 text-yellow-300 px-3 py-1 rounded-full text-xs uppercase tracking-widest border border-yellow-500/30">Sentimiento</span>
+                <span class="text-gray-500 text-xs">Memoria #<span id="detail-id">0</span></span>
+            </div>
+
+            <!-- Área de detalles -->
+            <div class="mt-6 flex-grow flex flex-col">
+                <label class="text-sm text-gray-400 mb-2 uppercase tracking-wide">Tus palabras para este recuerdo:</label>
+                <textarea id="detail-text" class="w-full flex-grow bg-black/40 border border-gray-700 rounded-lg p-4 text-gray-200 custom-scrollbar focus:outline-none focus:border-yellow-500 transition-colors resize-none" placeholder="Escribe aquí los detalles, la historia o lo que sentiste en este momento especial para Soyin..."></textarea>
+            </div>
+            
+            <button class="mt-4 w-full bg-yellow-600 hover:bg-yellow-500 text-black font-bold py-3 rounded-lg transition-colors shadow-[0_0_15px_rgba(202,138,4,0.4)]">Guardar en el Corazón</button>
+        </div>
+
+        <!-- Instrucciones en la parte inferior -->
+        <footer class="p-4 text-center w-full bg-gradient-to-t from-black/80 to-transparent">
+            <p class="text-xs md:text-sm text-gray-400">Arrastra para rotar el universo. Toca una foto para revelar sus detalles.</p>
+        </footer>
+
+        <!-- Botón de Música -->
+        <button id="music-btn">
+            <span id="music-icon">🔇</span> Reproducir Música
+        </button>
+
+        <!-- Notificación de Guardado -->
+        <div id="toast">¡Guardado en el corazón! ❤️</div>
+    </div>
+
+    <!-- Importar Three.js y OrbitControls -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+
+    <script>
+        // ==========================================
+        // CONFIGURACIÓN PRINCIPAL DE DATOS
+        // ==========================================
+        
+        const NUM_PHOTOS = 500;
+        const NUM_WORDS = 50;
+        const SPHERE_RADIUS = 300;
+
+        // Sentimientos para asignar a las fotos
+        const sentimientos = [
+            "Amor", "Paz", "Alegría", "Ternura", "Pasión", "Magia", "Luz", 
+            "Esperanza", "Destino", "Eternidad", "Felicidad", "Dulzura", 
+            "Infinito", "Inspiración", "Sueños", "Compañía", "Refugio", "Cariño"
+        ];
+
+        // 50 Palabras flotantes en el universo
+        const palabrasUniverso = [
+            "Soyin", "Te Amo", "Siempre", "Juntos", "Sonrisa", "Mirada", "Abrazos", "Besos",
+            "Alma", "Corazón", "Vida", "Luz", "Magia", "Historia", "Nosotros", "Promesa",
+            "Destino", "Estrellas", "Universo", "Infinito", "Paz", "Refugio", "Hogar",
+            "Confianza", "Alegría", "Ternura", "Suspiros", "Instantes", "Recuerdos", "Pasión",
+            "Aventura", "Compañera", "Dulce", "Especial", "Única", "Preciosa", "Amada",
+            "Sincera", "Leal", "Valiente", "Musa", "Sueño", "Realidad", "Cielo", "Latido",
+            "Locura", "Magia", "Amanecer", "Atardecer", "Eterno"
+        ];
+
+        // GENERADOR DE URLs DE FOTOS (AQUÍ PONES TUS 500 FOTOS)
+        // Para este ejemplo dinámico, generaremos un array. En la vida real, reemplaza esto:
+        // const urlsFotos = ["https://tu-sitio.com/foto1.jpg", "https://tu-sitio.com/foto2.jpg", ... (hasta 500)];
+        const urlsFotos = [];
+        
+        // TEXTOS PREDEFINIDOS: Aquí puedes colocar tus mensajes fijos.
+        // El número corresponde a la foto (empezando desde 0).
+        const textosPredefinidos = {
+            0: "El día que nos conocimos, mi mundo cambió para siempre. Eres mi estrella favorita.",
+            1: "Esa sonrisa es mi refugio favorito, me da paz cuando todo es caos.",
+            2: "En este lugar prometimos estar siempre juntos. Te amo, Soyin.",
+            // 3: "Tu mensaje para la foto 4...",
+            // Añade más números según necesites...
+        };
+
+        // Usamos Picsum con una "semilla" para simular variedad sin sobrecargar la red con 500 descargas enormes.
+        // Cargaremos solo 25 imágenes base y las repetiremos inteligentemente en los 500 cuadros.
+        for(let i = 0; i < NUM_PHOTOS; i++) {
+            urlsFotos.push(`https://picsum.photos/seed/soyin${i % 25}/300/300`); 
+        }
+
+        // ==========================================
+        // CONFIGURACIÓN THREE.JS
+        // ==========================================
+        
+        const container = document.getElementById('canvas-container');
+        const scene = new THREE.Scene();
+        scene.fog = new THREE.FogExp2(0x050505, 0.0015);
+
+        const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 2000);
+        camera.position.z = 800;
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        container.appendChild(renderer.domElement);
+
+        const controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.05;
+        controls.enablePan = false;
+        controls.minDistance = 100;
+        controls.maxDistance = 1000;
+        // Rotación automática suave
+        controls.autoRotate = true;
+        controls.autoRotateSpeed = 0.5;
+
+        // Luces
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
+        scene.add(ambientLight);
+        
+        const pointLight = new THREE.PointLight(0xffd700, 1, 1000);
+        pointLight.position.set(0, 0, 0);
+        scene.add(pointLight);
+
+        // Grupos
+        const imageSphereGroup = new THREE.Group();
+        const wordsGroup = new THREE.Group();
+        scene.add(imageSphereGroup);
+        scene.add(wordsGroup);
+
+        // ==========================================
+        // CREACIÓN DE LA ESFERA DE FOTOS
+        // ==========================================
+        
+        const textureLoader = new THREE.TextureLoader();
+        const raycastObjects = []; // Arreglo para detectar colisiones (hover/click)
+        
+        // Geometrías para la foto y el marco
+        const photoGeometry = new THREE.PlaneGeometry(30, 30);
+        const frameGeometry = new THREE.PlaneGeometry(34, 34);
+        
+        // Material del marco dorado
+        const frameMaterial = new THREE.MeshBasicMaterial({ 
+            color: 0xd4af37, // Dorado
+            side: THREE.DoubleSide 
+        });
+
+        // Material por defecto de las fotos (antes de cargar)
+        const defaultPhotoMaterial = new THREE.MeshBasicMaterial({ color: 0x222222, side: THREE.DoubleSide });
+
+        // Distribuir puntos en una esfera usando la Espiral de Fibonacci
+        const phi = Math.PI * (3 - Math.sqrt(5)); 
+        
+        for (let i = 0; i < NUM_PHOTOS; i++) {
+            const y = 1 - (i / (NUM_PHOTOS - 1)) * 2; 
+            const radiusAtY = Math.sqrt(1 - y * y);
+            const theta = phi * i;
+
+            const x = Math.cos(theta) * radiusAtY;
+            const z = Math.sin(theta) * radiusAtY;
+
+            // Posición final en la esfera
+            const position = new THREE.Vector3(
+                x * SPHERE_RADIUS, 
+                y * SPHERE_RADIUS, 
+                z * SPHERE_RADIUS
+            );
+
+            // Crear el marco
+            const frameMesh = new THREE.Mesh(frameGeometry, frameMaterial);
+            frameMesh.position.copy(position);
+            // Orientar el marco hacia afuera del centro de la esfera
+            frameMesh.lookAt(new THREE.Vector3(0,0,0));
+            // Voltear 180 grados para que la cara frontal apunte hacia la cámara exterior
+            frameMesh.rotateY(Math.PI); 
+
+            // Crear la foto (un poco adelante del marco para evitar z-fighting)
+            const photoMesh = new THREE.Mesh(photoGeometry, defaultPhotoMaterial.clone());
+            photoMesh.position.set(0, 0, 0.5); // Local al marco
+            frameMesh.add(photoMesh);
+
+            // Datos personalizados para interactividad
+            frameMesh.userData = {
+                id: i,
+                url: urlsFotos[i],
+                feeling: sentimientos[Math.floor(Math.random() * sentimientos.length)],
+                defaultText: textosPredefinidos[i] || "", // Carga tu texto predefinido si existe
+                isHovered: false,
+                originalScale: new THREE.Vector3(1, 1, 1),
+                targetScale: new THREE.Vector3(1, 1, 1),
+                photoMesh: photoMesh // Referencia a la malla de la foto para aplicarle textura después
+            };
+
+            imageSphereGroup.add(frameMesh);
+            raycastObjects.push(frameMesh);
+
+            // Cargar textura (diferido para no congelar el navegador)
+            setTimeout(() => {
+                textureLoader.load(urlsFotos[i], (texture) => {
+                    texture.colorSpace = THREE.SRGBColorSpace;
+                    photoMesh.material = new THREE.MeshBasicMaterial({ 
+                        map: texture,
+                        side: THREE.DoubleSide
+                    });
+                });
+            }, i * 15); // Stagger loading
+        }
+
+        // ==========================================
+        // CREACIÓN DE LAS PALABRAS FLOTANTES
+        // ==========================================
+        
+        // Función auxiliar para crear texturas de texto con Canvas API
+        function createTextTexture(text) {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = 512;
+            canvas.height = 128;
+            
+            ctx.fillStyle = 'rgba(0, 0, 0, 0)'; // Fondo transparente
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            ctx.font = 'bold 60px "Dancing Script", cursive';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            
+            // Sombra/Glow
+            ctx.shadowColor = '#d4af37';
+            ctx.shadowBlur = 15;
+            
+            // Texto dorado/blanco
+            const gradient = ctx.createLinearGradient(0, 0, canvas.width, 0);
+            gradient.addColorStop(0, "#ffdf00");
+            gradient.addColorStop(1, "#fff");
+            ctx.fillStyle = gradient;
+            
+            ctx.fillText(text, canvas.width / 2, canvas.height / 2);
+            
+            const texture = new THREE.CanvasTexture(canvas);
+            texture.needsUpdate = true;
+            return texture;
+        }
+
+        // Distribuir palabras en una esfera más grande
+        const WORDS_RADIUS = SPHERE_RADIUS + 150;
+        for(let i = 0; i < NUM_WORDS; i++) {
+            const word = palabrasUniverso[i % palabrasUniverso.length];
+            const textTexture = createTextTexture(word);
+            const spriteMaterial = new THREE.SpriteMaterial({ 
+                map: textTexture, 
+                transparent: true,
+                opacity: 0.8
+            });
+            const sprite = new THREE.Sprite(spriteMaterial);
+            
+            // Escala del texto
+            sprite.scale.set(100, 25, 1);
+            
+            // Posición aleatoria esférica
+            const u = Math.random();
+            const v = Math.random();
+            const theta = 2 * Math.PI * u;
+            const phiWord = Math.acos(2 * v - 1);
+            
+            sprite.position.x = WORDS_RADIUS * Math.sin(phiWord) * Math.cos(theta);
+            sprite.position.y = WORDS_RADIUS * Math.sin(phiWord) * Math.sin(theta);
+            sprite.position.z = WORDS_RADIUS * Math.cos(phiWord);
+            
+            // Datos para animación individual
+            sprite.userData = {
+                speed: Math.random() * 0.005 + 0.001,
+                axis: new THREE.Vector3(Math.random()-0.5, Math.random()-0.5, Math.random()-0.5).normalize()
+            };
+            
+            wordsGroup.add(sprite);
+        }
+
+        // ==========================================
+        // FONDO ESTRELLADO (PARTÍCULAS)
+        // ==========================================
+        const starsGeometry = new THREE.BufferGeometry();
+        const starsCount = 3000;
+        const posArray = new Float32Array(starsCount * 3);
+        
+        for(let i = 0; i < starsCount * 3; i++) {
+            posArray[i] = (Math.random() - 0.5) * 2000; // Spread amplio
+        }
+        
+        starsGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+        const starsMaterial = new THREE.PointsMaterial({
+            size: 2,
+            color: 0xffffff,
+            transparent: true,
+            opacity: 0.8,
+            sizeAttenuation: true
+        });
+        
+        const starMesh = new THREE.Points(starsGeometry, starsMaterial);
+        scene.add(starMesh);
+
+        // ==========================================
+        // INTERACTIVIDAD (RAYCASTER)
+        // ==========================================
+        
+        const raycaster = new THREE.Raycaster();
+        const mouse = new THREE.Vector2();
+        
+        const tooltip = document.getElementById('tooltip');
+        let hoveredObj = null;
+
+        window.addEventListener('mousemove', (event) => {
+            // Actualizar posición del ratón normalizada (-1 a +1)
+            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+            // Mover tooltip en CSS
+            tooltip.style.left = event.clientX + 'px';
+            tooltip.style.top = event.clientY + 'px';
+        });
+
+        // ==========================================
+        // UI & EVENTOS DE CLIC (Detalles de fotos)
+        // ==========================================
+        const detailModal = document.getElementById('detail-modal');
+        const detailImage = document.getElementById('detail-image');
+        const detailFeeling = document.getElementById('detail-feeling');
+        const detailId = document.getElementById('detail-id');
+        const detailText = document.getElementById('detail-text');
+        const closeBtn = document.getElementById('close-btn');
+        const saveBtn = document.querySelector('#detail-modal button'); // Botón guardar
+        const toast = document.getElementById('toast');
+
+        // ==========================================
+        // CONFIGURACIÓN DE MÚSICA
+        // ==========================================
+        const musicBtn = document.getElementById('music-btn');
+        const musicIcon = document.getElementById('music-icon');
+        
+        // IMPORTANTE: REEMPLAZA ESTE LINK POR EL LINK DIRECTO DE TU CANCIÓN (.mp3)
+        // Puedes subir un mp3 a Dropbox, cambiar "dl=0" a "raw=1" al final del link y pegarlo aquí.
+        const bgMusic = new Audio('https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3'); 
+        bgMusic.loop = true;
+        bgMusic.volume = 0.4; // Volumen (0.0 a 1.0)
+        let isMusicPlaying = false;
+
+        musicBtn.addEventListener('click', () => {
+            if (isMusicPlaying) {
+                bgMusic.pause();
+                musicIcon.innerText = '🔇';
+                musicBtn.innerHTML = '<span id="music-icon">🔇</span> Reproducir Música';
+            } else {
+                bgMusic.play();
+                musicIcon.innerText = '🔊';
+                musicBtn.innerHTML = '<span id="music-icon">🔊</span> Pausar Música';
+            }
+            isMusicPlaying = !isMusicPlaying;
+        });
+
+        window.addEventListener('click', (event) => {
+            // Si hacemos clic en paneles, ignorar lógica 3D
+            if(event.target.closest('#detail-modal') || event.target.closest('#music-btn')) return;
+
+            raycaster.setFromCamera(mouse, camera);
+            const intersects = raycaster.intersectObjects(raycastObjects);
+
+            if (intersects.length > 0) {
+                const object = intersects[0].object;
+                const data = object.userData;
+
+                // Actualizar y abrir panel de detalles
+                detailImage.src = data.url;
+                detailFeeling.innerText = data.feeling;
+                detailId.innerText = data.id + 1;
+                
+                // Cargar texto: Prioriza lo guardado localmente, si no, usa el predefinido.
+                const savedText = localStorage.getItem('soyin_msg_' + data.id);
+                detailText.value = savedText !== null ? savedText : data.defaultText;
+                
+                // Guardar el ID en el botón para saber qué foto modificamos
+                saveBtn.dataset.currentId = data.id;
+
+                detailModal.classList.add('open');
+                
+                // Detener rotación automática temporalmente
+                controls.autoRotate = false;
+            } else {
+                // Cerrar modal si se hace clic al vacío
+                detailModal.classList.remove('open');
+                controls.autoRotate = true;
+            }
+        });
+
+        closeBtn.addEventListener('click', () => {
+            detailModal.classList.remove('open');
+            controls.autoRotate = true;
+        });
+
+        // Evento para el botón "Guardar en el Corazón"
+        saveBtn.addEventListener('click', () => {
+            const currentId = saveBtn.dataset.currentId;
+            const currentText = detailText.value;
+            
+            // Guarda el texto en el navegador
+            localStorage.setItem('soyin_msg_' + currentId, currentText);
+            
+            // Mostrar notificación de éxito
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000); // Ocultar después de 3 segundos
+        });
+
+        // ==========================================
+        // BUCLE DE ANIMACIÓN
+        // ==========================================
+        
+        const clock = new THREE.Clock();
+
+        function animate() {
+            requestAnimationFrame(animate);
+            
+            const delta = clock.getDelta();
+            const time = clock.getElapsedTime();
+
+            controls.update();
+
+            // Rotar grupo de palabras lentamente en sentido contrario
+            wordsGroup.rotation.y = -time * 0.05;
+            wordsGroup.rotation.z = time * 0.02;
+
+            // Animación del fondo estrellado
+            starMesh.rotation.y = time * 0.01;
+
+            // Lógica de Raycasting para Hover
+            raycaster.setFromCamera(mouse, camera);
+            const intersects = raycaster.intersectObjects(raycastObjects);
+
+            // Restablecer el objeto anterior si ya no está en hover
+            if (hoveredObj && (intersects.length === 0 || intersects[0].object !== hoveredObj)) {
+                hoveredObj.userData.targetScale.set(1, 1, 1);
+                hoveredObj.material.color.setHex(0xd4af37); // Volver al dorado normal
+                tooltip.classList.remove('visible');
+                document.body.style.cursor = 'default';
+                hoveredObj = null;
+            }
+
+            // Aplicar efecto hover al objeto actual
+            if (intersects.length > 0) {
+                const object = intersects[0].object;
+                
+                if (hoveredObj !== object) {
+                    hoveredObj = object;
+                    hoveredObj.userData.targetScale.set(1.4, 1.4, 1.4); // Escalar al hacer hover
+                    hoveredObj.material.color.setHex(0xffffff); // Brillo blanco en el marco
+                    
+                    // Actualizar tooltip
+                    tooltip.innerText = object.userData.feeling;
+                    tooltip.classList.add('visible');
+                    document.body.style.cursor = 'pointer';
+                }
+            }
+
+            // Suavizar la escala de todas las fotos (Efecto Lerp)
+            for(let i=0; i<raycastObjects.length; i++) {
+                const obj = raycastObjects[i];
+                obj.scale.lerp(obj.userData.targetScale, 0.1);
+            }
+
+            // Animación suave de las palabras (efecto de flotación)
+            wordsGroup.children.forEach((sprite, index) => {
+                sprite.position.y += Math.sin(time * 2 + index) * 0.5;
+            });
+
+            renderer.render(scene, camera);
+        }
+
+        // Manejo de redimensionamiento de ventana
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        // Ocultar pantalla de carga una vez que inicia
+        window.onload = () => {
+            setTimeout(() => {
+                const loader = document.getElementById('loader');
+                loader.style.opacity = '0';
+                setTimeout(() => loader.remove(), 1000);
+            }, 2000); // Pequeño delay dramático para leer "Para Soyin"
+            
+            animate();
+        };
+
+    </script>
+</body>
+</html>
