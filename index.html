@@ -279,7 +279,6 @@
         
         // ¡LA ESFERA AHORA ES MÁS AMPLIA! 
         // Crece dinámicamente: para poquitas será pequeña, pero al tener 500 será enorme y espectacular.
-        // Mientras más fotos, más radio.
         let ACTUAL_SPHERE_RADIUS;
         if (ACTUAL_NUM_PHOTOS <= 20) {
             ACTUAL_SPHERE_RADIUS = 250; 
@@ -501,7 +500,7 @@
         // Las palabras flotan aún más lejos de la esfera de fotos
         const WORDS_RADIUS = ACTUAL_SPHERE_RADIUS + 200;
         for(let i = 0; i < NUM_WORDS; i++) {
-            const word = palabrasUniverso[i % palabrasUniverso.length];
+            const word = palabrasMundo[i % palabrasMundo.length];
             const textTexture = createTextTexture(word);
             const spriteMaterial = new THREE.SpriteMaterial({ 
                 map: textTexture, 
@@ -662,6 +661,7 @@
             });
             glowMaterial.opacity = pulseOpacity;
 
+            // Rotación de las palabras
             wordsGroup.rotation.y = -time * 0.05;
             wordsGroup.rotation.z = time * 0.02;
 
@@ -697,6 +697,7 @@
                 obj.scale.lerp(obj.userData.targetScale, 0.1);
             }
 
+            // Flotación individual de las palabras
             wordsGroup.children.forEach((sprite, index) => {
                 sprite.position.y += Math.sin(time * 2 + index) * 0.5;
             });
