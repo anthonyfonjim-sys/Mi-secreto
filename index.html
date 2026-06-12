@@ -114,8 +114,9 @@
             background: rgba(10, 10, 15, 0.7);
             border: 1px solid rgba(255, 215, 0, 0.4);
             color: #ffd700;
-            padding: 10px 20px;
-            border-radius: 30px;
+            padding: 6px 14px;
+            font-size: 0.8rem;
+            border-radius: 20px;
             cursor: pointer;
             backdrop-filter: blur(5px);
             transition: all 0.3s ease;
@@ -124,36 +125,12 @@
             font-family: 'Cinzel', serif;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 6px;
         }
 
         #music-btn:hover {
             background: rgba(255, 215, 0, 0.2);
             transform: scale(1.05);
-        }
-
-        /* Notificación Toast */
-        #toast {
-            position: absolute;
-            bottom: -50px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(212, 175, 55, 0.9);
-            color: black;
-            padding: 10px 20px;
-            border-radius: 20px;
-            font-family: 'Montserrat', sans-serif;
-            font-weight: bold;
-            opacity: 0;
-            transition: all 0.3s ease;
-            z-index: 30;
-            pointer-events: none;
-            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
-        }
-
-        #toast.show {
-            bottom: 20px;
-            opacity: 1;
         }
     </style>
 </head>
@@ -162,8 +139,9 @@
     <!-- Pantalla de carga -->
     <div id="loader" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black pointer-events-auto">
         <h1 class="title-font text-5xl md:text-7xl text-yellow-400 mb-6 drop-shadow-lg">Para Soyin</h1>
-        <div class="w-16 h-16 border-4 border-yellow-600 border-t-yellow-300 rounded-full animate-spin"></div>
-        <p class="mt-4 text-gray-400 tracking-widest text-sm uppercase">Creando el universo...</p>
+        <div id="loader-spinner" class="w-16 h-16 border-4 border-yellow-600 border-t-yellow-300 rounded-full animate-spin"></div>
+        <p id="loader-text" class="mt-4 text-gray-400 tracking-widest text-sm uppercase">Creando el universo...</p>
+        <button id="start-btn" class="hidden mt-8 bg-yellow-600 hover:bg-yellow-500 text-black font-bold py-3 px-8 rounded-full transition-all shadow-[0_0_20px_rgba(202,138,4,0.6)] text-xl serif-font animate-pulse">Entra a mi secreto</button>
     </div>
 
     <!-- Contenedor 3D -->
@@ -174,7 +152,7 @@
         
         <!-- Encabezado -->
         <header class="p-6 text-center md:text-left drop-shadow-md">
-            <h1 class="title-font text-5xl md:text-6xl text-yellow-300 tracking-wide text-shadow">Universo Soyin</h1>
+            <h1 class="title-font text-5xl md:text-6xl text-yellow-300 tracking-wide text-shadow">Mi Mundo Soyin</h1>
             <p class="text-gray-300 mt-2 text-sm md:text-base tracking-widest uppercase">Explora nuestros recuerdos</p>
         </header>
 
@@ -187,24 +165,22 @@
             
             <h2 class="serif-font text-2xl text-yellow-400 mb-6 mt-8 border-b border-yellow-600/30 pb-2">Un Momento Especial</h2>
             
-            <!-- Imagen en grande -->
-            <div class="w-full h-64 bg-gray-800 rounded-lg overflow-hidden border border-yellow-600/50 shadow-lg relative">
-                <img id="detail-image" src="" alt="Recuerdo" class="w-full h-full object-cover">
-                <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+            <!-- Imagen en grande sin recortes -->
+            <div class="w-full h-72 bg-black rounded-lg overflow-hidden border border-yellow-600/50 shadow-lg relative flex items-center justify-center">
+                <img id="detail-image" src="" alt="Recuerdo" class="max-w-full max-h-full object-contain z-10 hidden">
+                <video id="detail-video" src="" controls class="max-w-full max-h-full object-contain z-10 hidden"></video>
+                <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent pointer-events-none z-20"></div>
             </div>
 
-            <div class="mt-4 flex items-center justify-between">
-                <span id="detail-feeling" class="bg-yellow-900/40 text-yellow-300 px-3 py-1 rounded-full text-xs uppercase tracking-widest border border-yellow-500/30">Sentimiento</span>
-                <span class="text-gray-500 text-xs">Memoria #<span id="detail-id">0</span></span>
+            <div class="mt-4 flex items-center justify-center">
+                <span id="detail-feeling" class="bg-yellow-900/40 text-yellow-300 px-4 py-1.5 rounded-full text-sm uppercase tracking-widest border border-yellow-500/30 shadow-[0_0_10px_rgba(255,215,0,0.2)]">Sentimiento</span>
             </div>
 
-            <!-- Área de detalles -->
-            <div class="mt-6 flex-grow flex flex-col">
-                <label class="text-sm text-gray-400 mb-2 uppercase tracking-wide">Tus palabras para este recuerdo:</label>
-                <textarea id="detail-text" class="w-full flex-grow bg-black/40 border border-gray-700 rounded-lg p-4 text-gray-200 custom-scrollbar focus:outline-none focus:border-yellow-500 transition-colors resize-none" placeholder="Escribe aquí los detalles, la historia o lo que sentiste en este momento especial para Soyin..."></textarea>
+            <!-- Área de detalles con mensaje tierno -->
+            <div class="mt-8 flex-grow flex flex-col items-center text-center">
+                <div class="w-12 h-1 bg-yellow-600/50 rounded-full mb-6"></div>
+                <p id="detail-text" class="text-3xl md:text-4xl text-yellow-100 title-font tracking-wide leading-relaxed px-2 drop-shadow-md"></p>
             </div>
-            
-            <button class="mt-4 w-full bg-yellow-600 hover:bg-yellow-500 text-black font-bold py-3 rounded-lg transition-colors shadow-[0_0_15px_rgba(202,138,4,0.4)]">Guardar en el Corazón</button>
         </div>
 
         <!-- Instrucciones en la parte inferior -->
@@ -216,9 +192,6 @@
         <button id="music-btn">
             <span id="music-icon">🔇</span> Reproducir Música
         </button>
-
-        <!-- Notificación de Guardado -->
-        <div id="toast">¡Guardado en el corazón! ❤️</div>
     </div>
 
     <!-- Importar Three.js y OrbitControls -->
@@ -230,18 +203,14 @@
         // CONFIGURACIÓN PRINCIPAL DE DATOS
         // ==========================================
         
-        const NUM_PHOTOS = 500;
         const NUM_WORDS = 50;
-        const SPHERE_RADIUS = 300;
 
-        // Sentimientos para asignar a las fotos
         const sentimientos = [
             "Amor", "Paz", "Alegría", "Ternura", "Pasión", "Magia", "Luz", 
             "Esperanza", "Destino", "Eternidad", "Felicidad", "Dulzura", 
             "Infinito", "Inspiración", "Sueños", "Compañía", "Refugio", "Cariño"
         ];
 
-        // 50 Palabras flotantes en el universo
         const palabrasUniverso = [
             "Soyin", "Te Amo", "Siempre", "Juntos", "Sonrisa", "Mirada", "Abrazos", "Besos",
             "Alma", "Corazón", "Vida", "Luz", "Magia", "Historia", "Nosotros", "Promesa",
@@ -252,25 +221,74 @@
             "Locura", "Magia", "Amanecer", "Atardecer", "Eterno"
         ];
 
-        // GENERADOR DE URLs DE FOTOS (AQUÍ PONES TUS 500 FOTOS)
-        // Para este ejemplo dinámico, generaremos un array. En la vida real, reemplaza esto:
-        // const urlsFotos = ["https://tu-sitio.com/foto1.jpg", "https://tu-sitio.com/foto2.jpg", ... (hasta 500)];
-        const urlsFotos = [];
+        // ==========================================
+        // 🌟 TUS RECUERDOS (NUEVA LISTA COMPLETA DE FACEBOOK) 🌟
+        // ==========================================
+        // Aquí están todos los enlaces que proporcionaste. 
+        // Agregué mensajes románticos aleatorios que luego puedes cambiar si lo deseas.
         
-        // TEXTOS PREDEFINIDOS: Aquí puedes colocar tus mensajes fijos.
-        // El número corresponde a la foto (empezando desde 0).
-        const textosPredefinidos = {
-            0: "El día que nos conocimos, mi mundo cambió para siempre. Eres mi estrella favorita.",
-            1: "Esa sonrisa es mi refugio favorito, me da paz cuando todo es caos.",
-            2: "En este lugar prometimos estar siempre juntos. Te amo, Soyin.",
-            // 3: "Tu mensaje para la foto 4...",
-            // Añade más números según necesites...
+        const misRecuerdos = {Senti
+            v1: { url: "https://dl.dropboxusercontent.com/scl/fi/y87lqq6253c85t687cp86/VID-20260610-WA0122.mp4?rlkey=p2ubbm2ouwxuaq49v9n1pdq0l&st=xn61kzyu", type: "video", mensaje: "Mi respuesta es toda las veces necesarias por que mi amor hacia ti es profundo.", sentimiento: "Sentí mucha emoción" },
+            v2: { url: "https://dl.dropboxusercontent.com/scl/fi/r2kxt8rkpgaqz8ry01i4p/VID-20260610-WA0123.mp4?rlkey=v9tvdm4y29v58o7kpkyf3c0co&st=d4cuytlg", type: "video", mensaje: "Me encanta esa creatividad que tienes cariño.", sentimiento: "Divertida mi cielo" },
+            v3: { url: "https://dl.dropboxusercontent.com/scl/fi/rxkbpdyi91oisznda7bkr/VID-20260610-WA0144.mp4?rlkey=ld2ixjpjaswgrotx1ty5t075x&st=trx8x5gf", type: "video", mensaje: "Tan tierna cariño.", sentimiento: "Linda con ese gesto cariño" },
+            v4: { url: "https://dl.dropboxusercontent.com/scl/fi/a7ey9kzfhya0xddt0urw0/VID-20260610-WA0366.mp4?rlkey=xba3jrbe7ua71srol49fpg7u7&st=wgpr0mlv", type: "video", mensaje: "Grabado en video y en el corazón.", sentimiento: "Ternura" },
+            v5: { url: "https://dl.dropboxusercontent.com/scl/fi/c7axej6dbggnn9m00i7r9/VID-20260610-WA0449.mp4?rlkey=reu80upr5jpxwg41pspyjq6jr&st=gzhodgml", type: "video", mensaje: "Poderosa mi amor me encanto tu reacción y yu respuesta.", sentimiento: "Encanto" },
+            v6: { url: "https://dl.dropboxusercontent.com/scl/fi/7ck6h7kgf0yk3owqwk4as/VID-20260610-WA0467.mp4?rlkey=iagq5sycooh3si36kchtkzec7&st=cw97ud35", type: "video", mensaje: "Encantadora mi vida solo tenias que escribirme y me tenias a tus pies cariño.", sentimiento: "Pasión" },
+            v7: { url: "https://dl.dropboxusercontent.com/scl/fi/1yevr9nhi7ji83vn8lknd/VID-20260610-WA0468.mp4?rlkey=47w6le7sn8x60ntkf7s3p6i95&st=19m5wy0w", type: "video", mensaje: "Me encanta tu voz mi vida.", sentimiento: "Es muy adictiva" },
+            0: { url: "https://scontent.fmga3-1.fna.fbcdn.net/v/t39.30808-6/722520584_122106797991352699_1078166631354303126_n.jpg?stp=dst-jpg_tt6&cstp=mx720x1600&ctp=s720x1600&_nc_cat=104&ccb=1-7&_nc_sid=833d8c&_nc_ohc=L_CNVTU3zGwQ7kNvwEqPSQt&_nc_oc=AdriL4x8blQt0BhLE03Vnuo_mr-1r66UF5lJi2vaaTx5mbE2S9PUSrCQzu9DwWWP_4iQFs2tTtnTICaaQ5C1X--c&_nc_zt=23&_nc_ht=scontent.fmga3-1.fna&_nc_gid=svIBF-PsG8mTR7_87_aIxQ&_nc_ss=7b2a8&oh=00_Af_fN58nWjD4HrLTbSsvX0OH4BOoWFs3jcCx5-cdDS7CqQ&oe=6A317F03", mensaje: "Nuestra primer video llamada juntos fue muy hermosa.", sentimiento: "Mi primer tesoro viendote cariño" },
+            1: { url: "https://scontent.fmga3-2.fna.fbcdn.net/v/t39.30808-6/720971500_122106809109352699_1682261554419580646_n.jpg?stp=dst-jpg_tt6&cstp=mx1220x2036&ctp=s1220x2036&_nc_cat=107&ccb=1-7&_nc_sid=833d8c&_nc_ohc=XldjOZ8dDCAQ7kNvwEXcnBy&_nc_oc=AdouCPZ6P90lPcQHMcG4pBi3u37sMmzf0rJVE71xwJwX7CUY7jWBlPPAUcFJ8x7jPUIcHHReibGNwvzxdXk9AV7V&_nc_zt=23&_nc_ht=scontent.fmga3-2.fna&_nc_gid=j_kYwDgAXFl3eKrwl0Zw0A&_nc_ss=7b2a8&oh=00_Af_aZnfNzeS-4Dtbg7PoWXvAkNl-5I51Lk7UCbHOnfKdgQ&oe=6A318CC1", mensaje: "Tu sonrisa es mi lugar favorito.", sentimiento: "Me da mucha paz y felicidad" },
+            2: { url: "https://scontent.fmga11-2.fna.fbcdn.net/v/t39.30808-6/720552607_122106788697352699_4935738709730301620_n.jpg?stp=cp6_dst-jpg_tt6&cstp=mx1220x2712&ctp=s1220x2712&_nc_cat=106&ccb=1-7&_nc_sid=833d8c&_nc_ohc=vakKpew5TtgQ7kNvwFXV33g&_nc_oc=Adpw-sIxCe_Ioe1TVNRXKMh8u8LbwKJM8UsfvGziZPYHh07ZGOpIp72yQMUnO1prxEo&_nc_zt=23&_nc_ht=scontent.fmga11-2.fna&_nc_gid=p_w7bk-tVHKb7tygGP9wAA&_nc_ss=7b2a8&oh=00_Af8qfFNr7T8J-9ufiKFJHsDeJ8ediLCFgnNKSrKLlsRAlA&oe=6A316E4B", mensaje: "Siempre juntos, a pesar de todo.", sentimiento: "Destino" },
+            3: { url: "https://scontent.fmga11-1.fna.fbcdn.net/v/t39.30808-6/720226692_122106788739352699_5309405894904846658_n.jpg?stp=cp6_dst-jpg_tt6&cstp=mx1220x2712&ctp=s1220x2712&_nc_cat=109&ccb=1-7&_nc_sid=833d8c&_nc_ohc=iGd1WRIQ83QQ7kNvwGPLsq9&_nc_oc=AdpPi2T7TIPV7JM29WwaVqOyFJxUkSzErdk1F6xlejwAc05orE0y80wZ_6shvdfFBIs&_nc_zt=23&_nc_ht=scontent.fmga11-1.fna&_nc_gid=kd_0WYuXppZEoQ6irpQWOw&_nc_ss=7b2a8&oh=00_Af-fufb2OXPkCLHSK_ZLcSRL3s6piTSNFY9UBn-L1ZL44w&oe=6A318817", mensaje: "Contigo todo es mágico.", sentimiento: "Magia" },
+            4: { url: "https://scontent.fmga11-2.fna.fbcdn.net/v/t39.30808-6/720064036_122106788793352699_7339965541720744965_n.jpg?stp=cp6_dst-jpg_tt6&cstp=mx1220x2712&ctp=s1220x2712&_nc_cat=102&ccb=1-7&_nc_sid=833d8c&_nc_ohc=3zPstLmyKwYQ7kNvwEyVXqW&_nc_oc=AdpxRsO0Sx_QJ2LgNjtSW59X4flc6UR5hUm3Ym84AJMreLpNQ1LF0Q41Alt_G5xfWEQ&_nc_zt=23&_nc_ht=scontent.fmga11-2.fna&_nc_gid=A20p2uPSaZTMH8oqorGkhA&_nc_ss=7b2a8&oh=00_Af_hqlewyVVMS0TAtREz5uZLnjht9DK1lfdoBSVGiHOskg&oe=6A3188F0", mensaje: "Mi vida es mejor desde que llegaste.", sentimiento: "Alegría" },
+            5: { url: "https://scontent.fmga11-1.fna.fbcdn.net/v/t39.30808-6/722953878_122106788835352699_2482205560075830853_n.jpg?stp=cp6_dst-jpg_tt6&cstp=mx1220x2712&ctp=s1220x2712&_nc_cat=109&ccb=1-7&_nc_sid=833d8c&_nc_ohc=T5ZQPYGJ2C0Q7kNvwG1uFiF&_nc_oc=Adqzx065bC7BlC5ONY8sDaQSmKc4xQEF4-__q-22dpAk2hs7NepRqHRhpEdgNdnvDNg&_nc_zt=23&_nc_ht=scontent.fmga11-1.fna&_nc_gid=K94w4dMAQsOYkFKP2F7gfw&_nc_ss=7b2a8&oh=00_Af-gGiKNTNJy2pfsSkpo3pvggMuEC3_QIE-ktwSzbPNCZA&oe=6A318A28", mensaje: "Eres el amor de mi vida.", sentimiento: "Amor Eterno" },
+            6: { url: "https://scontent.fmga3-1.fna.fbcdn.net/v/t39.30808-6/723509338_122106788889352699_5516316037265988144_n.jpg?stp=cp6_dst-jpg_tt6&cstp=mx1220x2712&ctp=s1220x2712&_nc_cat=108&ccb=1-7&_nc_sid=833d8c&_nc_ohc=WcAjZkI4WdsQ7kNvwGpD1cl&_nc_oc=AdrsTQONiaJsDx8cs9Q0OddeOsahxPk9W8Vp_E-KRIPhtnFdfUU69NXZKBtYv0UdM4U&_nc_zt=23&_nc_ht=scontent.fmga3-1.fna&_nc_gid=Nq5i24yIW71b5c0oBAh9cw&_nc_ss=7b2a8&oh=00_Af8Rau21prBabgMZpuesi9gd3C73ZWr6uCeQUSlERDbXjw&oe=6A31603A", mensaje: "Cada instante a tu lado es oro.", sentimiento: "Felicidad" },
+            7: { url: "https://scontent.fmga3-1.fna.fbcdn.net/v/t39.30808-6/723118328_122106788931352699_7805238013460772941_n.jpg?stp=cp6_dst-jpg_tt6&cstp=mx1220x2712&ctp=s1220x2712&_nc_cat=108&ccb=1-7&_nc_sid=833d8c&_nc_ohc=url3gq2FbmsQ7kNvwHadAx9&_nc_oc=AdpbbV8B44Ezbs0Thn3_T8dKUWedHE319KBNm0OWuEbyKWeSoMtqXtXrN1gedU-gEbg&_nc_zt=23&_nc_ht=scontent.fmga3-1.fna&_nc_gid=HIhQgmpPgWhjGIA9nSt_bw&_nc_ss=7b2a8&oh=00_Af8y7GE3t9tCKipPRoQiYOgEND4BJ1y4LI98n9GYlSs-Ow&oe=6A31560F", mensaje: "No te cambiaría por nada en este mundo.", sentimiento: "Ternura" },
+            8: { url: "https://scontent.fmga11-1.fna.fbcdn.net/v/t39.30808-6/722383981_122106788991352699_5079665112842307117_n.jpg?stp=cp6_dst-jpg_tt6&cstp=mx1220x2712&ctp=s1220x2712&_nc_cat=109&ccb=1-7&_nc_sid=833d8c&_nc_ohc=nUNu_w_sOLsQ7kNvwGsR65S&_nc_oc=AdrcajUN2dsKY7yZZ1LmoE4JnHz4NY-KKqoZy_fPLq8UfU8_lj0UroFUOgMJjVlMDf8&_nc_zt=23&_nc_ht=scontent.fmga11-1.fna&_nc_gid=LzediwlV8OiuxJ0stLfLvA&_nc_ss=7b2a8&oh=00_Af-Wri4w8ZjXyo6c0HFpwEyy1H4PVW1MUkWciGRiMOphCQ&oe=6A317087", mensaje: "Amo tu forma de ser y de quererme.", sentimiento: "Pasión" },
+            9: { url: "https://scontent.fmga3-1.fna.fbcdn.net/v/t39.30808-6/722305075_122106789039352699_6937448306644465051_n.jpg?stp=cp6_dst-jpg_tt6&cstp=mx1220x2712&ctp=s1220x2712&_nc_cat=104&ccb=1-7&_nc_sid=833d8c&_nc_ohc=im18wX5hC_IQ7kNvwHPW6Mx&_nc_oc=Adohrw0MhRQQ-03ihUYws-lnIQvhgy1QkXKPpiD-89cJKyOb1vdF7ktFzg6qgvY9vlE&_nc_zt=23&_nc_ht=scontent.fmga3-1.fna&_nc_gid=roOQsfQPQBql-xlcJH26rg&_nc_ss=7b2a8&oh=00_Af_3wHiv_Jj-hxIAkp2xnb4bfK8FZBHad3g2xl4G1qU8xQ&oe=6A317617", mensaje: "Este fue un día inolvidable.", sentimiento: "Recuerdos" },
+            10: { url: "https://scontent.fmga3-1.fna.fbcdn.net/v/t39.30808-6/719891136_122106789087352699_416261758488428549_n.jpg?stp=cp6_dst-jpg_tt6&cstp=mx1220x2712&ctp=s1220x2712&_nc_cat=100&ccb=1-7&_nc_sid=833d8c&_nc_ohc=aSa2uq_Ta-wQ7kNvwHaSZ0D&_nc_oc=AdorEegk17cU0iho10H4FXMZYBj34hwAWqmcWNJsvLO4HXZWLnUSnT2wzrUX5-A8ltU&_nc_zt=23&_nc_ht=scontent.fmga3-1.fna&_nc_gid=tfozBJ-g0ZP28220an0Eog&_nc_ss=7b2a8&oh=00_Af_GTLHeDcEAuf-_yKj3ohJOZ7UvHjlJNduL7KfkWa9hpg&oe=6A315F3E", mensaje: "Mi corazón es tuyo, Soyin.", sentimiento: "Corazón" },
+            11: { url: "https://scontent.fmga11-1.fna.fbcdn.net/v/t39.30808-6/721099331_122106789141352699_4442194806856159084_n.jpg?stp=cp6_dst-jpg_tt6&cstp=mx1220x2712&ctp=s1220x2712&_nc_cat=109&ccb=1-7&_nc_sid=833d8c&_nc_ohc=hGIvAhx9CUgQ7kNvwHOr3qq&_nc_oc=AdoxtS24NkOKmgp9zaL0fD3OP3sud_CBC-U1lvUqarpxgS4fe65TPUlc4UsT9UOJFMc&_nc_zt=23&_nc_ht=scontent.fmga11-1.fna&_nc_gid=nGMWYhh5h33cDOI_9xk_Cg&_nc_ss=7b2a8&oh=00_Af9q78F-JqJZdP18i4ZbHVi3OFnttkAr4n0u4k81tsY44w&oe=6A316DA2", mensaje: "La vida es hermosa si tú estás en ella.", sentimiento: "Belleza" },
+            12: { url: "https://scontent.fmga11-2.fna.fbcdn.net/v/t39.30808-6/720467643_122106789201352699_2253876430272557105_n.jpg?stp=cp6_dst-jpg_tt6&cstp=mx1220x2712&ctp=s1220x2712&_nc_cat=110&ccb=1-7&_nc_sid=833d8c&_nc_ohc=9oCwdDeoKRAQ7kNvwEe0wZf&_nc_oc=AdoMzq9GPcAobK7-E7MurOk0zlPXvsdk5aB_c0A8mLmU3DHGrcfvESUUhzpDRXOHZXE&_nc_zt=23&_nc_ht=scontent.fmga11-2.fna&_nc_gid=C4YhwfWD9AnB2tToF1qeow&_nc_ss=7b2a8&oh=00_Af9ej0N8gocbdF2RtQ4K0cYvIsADPuyi0SoHpqf7ZzK8Nw&oe=6A3177EC", mensaje: "Nosotros contra el mundo.", sentimiento: "Compañía" },
+            13: { url: "https://scontent.fmga3-1.fna.fbcdn.net/v/t39.30808-6/722097637_122106789267352699_8259144393809158320_n.jpg?stp=cp6_dst-jpg_tt6&cstp=mx1220x2712&ctp=s1220x2712&_nc_cat=108&ccb=1-7&_nc_sid=833d8c&_nc_ohc=6PpmvjxYQ0EQ7kNvwEuEkwC&_nc_oc=AdrdszDtHfen_nfCrvet45VZyLEjJ2QB49iaFwiFtPQNVUtSXsibkNEzegewDe8eGxQ&_nc_zt=23&_nc_ht=scontent.fmga3-1.fna&_nc_gid=E7iOTMcgQc0SBXOLwoPx7A&_nc_ss=7b2a8&oh=00_Af_bqhmwA30mKez5tAcvfirFDygvoVFSRSWZlqxkVQo9yw&oe=6A318121", mensaje: "A tu lado cada detalle brilla.", sentimiento: "Luz" },
+            14: { url: "https://scontent.fmga3-1.fna.fbcdn.net/v/t39.30808-6/721466015_122106789333352699_3299139876556543774_n.jpg?stp=cp6_dst-jpg_tt6&cstp=mx1220x2712&ctp=s1220x2712&_nc_cat=108&ccb=1-7&_nc_sid=833d8c&_nc_ohc=S-1blo5VURIQ7kNvwHYCJDx&_nc_oc=AdolSRl8n_WQPdeEcK782RvZbTpW7ev9AUHa1KSZoHgHIh_FWFxtMxNyyztByRt-lIk&_nc_zt=23&_nc_ht=scontent.fmga3-1.fna&_nc_gid=h7YLMZRrDzphqsu9XOodAQ&_nc_ss=7b2a8&oh=00_Af_BCZ4Cbl4AgfvPtnf4ACG5_G6GeF2Gec-Rd11mBaywpA&oe=6A31610C", mensaje: "Por muchas más aventuras juntos.", sentimiento: "Aventura" },
+            15: { url: "https://scontent.fmga3-2.fna.fbcdn.net/v/t39.30808-6/723894959_122106789375352699_4013537382996637140_n.jpg?stp=cp6_dst-jpg_tt6&cstp=mx1220x2712&ctp=s1220x2712&_nc_cat=107&ccb=1-7&_nc_sid=833d8c&_nc_ohc=xzKseT0RTVEQ7kNvwEPuNos&_nc_oc=AdobEi_-GHaHXfo-zxQ2iHSiqnu-J0BTSAtKRvK-kTph9g7dAk9JsgPl2gGU_X4PW0g&_nc_zt=23&_nc_ht=scontent.fmga3-2.fna&_nc_gid=G3rFSBT7ZS9sVAv5KBBFhg&_nc_ss=7b2a8&oh=00_Af-LtYUGaTPoREf0YDBtE4qlWpz63449jvQi4lbKdP79vw&oe=6A315E1A", mensaje: "Mi mejor casualidad.", sentimiento: "Casualidad" },
+            16: { url: "https://scontent.fmga11-2.fna.fbcdn.net/v/t39.30808-6/720721745_122106789465352699_4766276157155409496_n.jpg?stp=cp6_dst-jpg_tt6&cstp=mx1220x2712&ctp=s1220x2712&_nc_cat=102&ccb=1-7&_nc_sid=833d8c&_nc_ohc=YK6ncisdnaoQ7kNvwH_3GfR&_nc_oc=Adp9n9Wtx3muVirXoJ3QzApIhAGiatd0_uPiw_BkFklWEdwc3KinPX-DHeIlNIRWEOs&_nc_zt=23&_nc_ht=scontent.fmga11-2.fna&_nc_gid=C5RGTyc6a-xUVc4whO3y-Q&_nc_ss=7b2a8&oh=00_Af9Qigle1tkBPL77HSy86Z-peTYr4-4QxA-WfvFh3SUyIQ&oe=6A318396", mensaje: "Gracias por existir.", sentimiento: "Gratitud" },
+            17: { url: "https://scontent.fmga11-2.fna.fbcdn.net/v/t39.30808-6/720206439_122106789525352699_6094218530786615031_n.jpg?stp=cp6_dst-jpg_tt6&cstp=mx1220x2712&ctp=s1220x2712&_nc_cat=102&ccb=1-7&_nc_sid=833d8c&_nc_ohc=hWYoUOdqcOAQ7kNvwEFONKr&_nc_oc=Adp-AXN07RPHArKoApPrps6_4HL1YI98PNihtbl5hqIefijvKzqlTzkd6Q66N1FSvks&_nc_zt=23&_nc_ht=scontent.fmga11-2.fna&_nc_gid=Ld8aXxqdAd43luEPyl5vJA&_nc_ss=7b2a8&oh=00_Af_HH9aSAZqfe5V930XPBIb_YqfjquDTmnO7rSPtr6G-wA&oe=6A316B30", mensaje: "Mi hogar eres tú.", sentimiento: "Hogar" },
+            18: { url: "https://scontent.fmga3-1.fna.fbcdn.net/v/t39.30808-6/722560449_122106789573352699_5228493687883220555_n.jpg?stp=cp6_dst-jpg_tt6&cstp=mx1220x2712&ctp=s1220x2712&_nc_cat=100&ccb=1-7&_nc_sid=833d8c&_nc_ohc=q6LXc1RNVgEQ7kNvwHO8rLf&_nc_oc=AdrY4ssXYs285PTUuX8Z4vv7Ga9jiSVZ0Nwb7HcZktd__RvAb_9tYj8OvyTjMFwBqS0&_nc_zt=23&_nc_ht=scontent.fmga3-1.fna&_nc_gid=E-941kpvWf-HLKsZuVn4hQ&_nc_ss=7b2a8&oh=00_Af8dorU4NtzMQ-ZXGVMgu1R2OYJfDlEet2EaRmwWWv7TqA&oe=6A316901", mensaje: "Una mirada que lo dice todo.", sentimiento: "Conexión" },
+            19: { url: "https://scontent.fmga11-2.fna.fbcdn.net/v/t39.30808-6/723066230_122106789621352699_3330501700415158984_n.jpg?stp=cp6_dst-jpg_tt6&cstp=mx1220x2712&ctp=s1220x2712&_nc_cat=110&ccb=1-7&_nc_sid=833d8c&_nc_ohc=G3Hpjgn1vFUQ7kNvwFOdmr2&_nc_oc=Adpitx9INux1abRSIYNTO2Lm4GDUsuyHJy4FcqTfuWWjKSpD3FLDUaR1jr09XIT_iDA&_nc_zt=23&_nc_ht=scontent.fmga11-2.fna&_nc_gid=12_kj_NccQazhexzNPCyOg&_nc_ss=7b2a8&oh=00_Af9eFM599jF2BgLP_m6CAKu-y9ZlhojKIdh8QCihlr85qg&oe=6A3174DA", mensaje: "Atesoraré este momento toda mi vida.", sentimiento: "Eternidad" },
+            20: { url: "https://scontent.fmga11-2.fna.fbcdn.net/v/t39.30808-6/722285978_122106789669352699_6070243408150365616_n.jpg?stp=cp6_dst-jpg_tt6&cstp=mx1220x2712&ctp=s1220x2712&_nc_cat=102&ccb=1-7&_nc_sid=833d8c&_nc_ohc=i3SObwhLf5UQ7kNvwHJ2KRY&_nc_oc=AdpcTvZdn0K3M6qVFKhYiIuqERvGAevGNRN7IU1T4A6LwsDuorG-c7yOF5TlhgS2B2s&_nc_zt=23&_nc_ht=scontent.fmga11-2.fna&_nc_gid=jlwtGZks6CKusTmm_hxfoQ&_nc_ss=7b2a8&oh=00_Af98hAZAYI62A-o3-2_h6LUe_IZST-0PCJGdl3yBwO_3QQ&oe=6A3169CC", mensaje: "Mi confidente, mi cómplice.", sentimiento: "Confianza" },
+            21: { url: "https://scontent.fmga3-2.fna.fbcdn.net/v/t39.30808-6/721135116_122106789723352699_8680377745362667308_n.jpg?stp=cp6_dst-jpg_tt6&cstp=mx1220x2712&ctp=s1220x2712&_nc_cat=103&ccb=1-7&_nc_sid=833d8c&_nc_ohc=8gcgLeGPrRAQ7kNvwFQv08T&_nc_oc=AdoeKudEbArsvtesRaiD9TLorw27XYHTzz_3s_2cniNKT2itSn4Cwi7vpvW7J4Lq-qE&_nc_zt=23&_nc_ht=scontent.fmga3-2.fna&_nc_gid=oYHKaP9-t9fl9f5WjG4GYg&_nc_ss=7b2a8&oh=00_Af9wsL-43FKNM5bX1HJuSphm2Vnmchl8NIkwzzNKRB0fAQ&oe=6A3157C0", mensaje: "Nuestras sonrisas combinan perfecto.", sentimiento: "Armonía" },
+            22: { url: "https://scontent.fmga3-2.fna.fbcdn.net/v/t39.30808-6/722296584_122106789765352699_8663050379780613802_n.jpg?stp=cp6_dst-jpg_tt6&cstp=mx1220x2712&ctp=s1220x2712&_nc_cat=105&ccb=1-7&_nc_sid=833d8c&_nc_ohc=xfUaVY5FG9kQ7kNvwFrlH0Z&_nc_oc=Adqqzs09Mk-6mHhh6Npil-PihI_-OOKtYSonP_UVfc-wcy4GH_j1Qta_bDb9HqfsB5o&_nc_zt=23&_nc_ht=scontent.fmga3-2.fna&_nc_gid=7tJlKbSd_b5YCeMW1_4fqA&_nc_ss=7b2a8&oh=00_Af-dvHLuP0HFHS0OOTQtFxxqnGTm0RkdfuwMq5_fAZ_DBg&oe=6A3160DF", mensaje: "El mundo es pequeño cuando estoy contigo.", sentimiento: "Infinito" },
+            23: { url: "https://scontent.fmga11-1.fna.fbcdn.net/v/t39.30808-6/723186979_122106789849352699_8827894627265968098_n.jpg?stp=cp6_dst-jpg_tt6&cstp=mx1220x2712&ctp=s1220x2712&_nc_cat=109&ccb=1-7&_nc_sid=833d8c&_nc_ohc=kKn7OrrLsF8Q7kNvwHZPLpZ&_nc_oc=Adroou56gjiWVjVWvJyQEyZOrKSKW0Sj6er4XuOMw5BX5fWFyssisL0BveUkTYc3C50&_nc_zt=23&_nc_ht=scontent.fmga11-1.fna&_nc_gid=IzIaeZckrHec3nqEN7FLWg&_nc_ss=7b2a8&oh=00_Af9pR7X3ED4Ca4LAu9PwhH4cXr-P1d71JakpQkyQDJGB2A&oe=6A318977", mensaje: "Mi persona favorita en este mundo entero.", sentimiento: "Especial" },
+            24: { url: "https://scontent.fmga11-2.fna.fbcdn.net/v/t39.30808-6/722286625_122106789897352699_7669109032118862847_n.jpg?stp=cp6_dst-jpg_tt6&cstp=mx1220x2712&ctp=s1220x2712&_nc_cat=110&ccb=1-7&_nc_sid=833d8c&_nc_ohc=uWCZklPl-cUQ7kNvwHYL-QX&_nc_oc=AdqWQ8QxEaDsTltZ2tIt_SgbXg3-zfDMx5OYz0vsWn1EQeWtYz_H-YwJJBHtVs0G_MA&_nc_zt=23&_nc_ht=scontent.fmga11-2.fna&_nc_gid=XS_9U4FFEQm9cWFw41CR7w&_nc_ss=7b2a8&oh=00_Af-oy--gKysyUxG_BEhyrVjlNSDVSVhWmjiNC4ULbDKdmQ&oe=6A318062", mensaje: "Quiero coleccionar mil recuerdos así.", sentimiento: "Colección" },
+            25: { url: "https://scontent.fmga3-2.fna.fbcdn.net/v/t39.30808-6/721950229_122106789951352699_1637880217579928138_n.jpg?stp=cp6_dst-jpg_tt6&cstp=mx1220x2712&ctp=s1220x2712&_nc_cat=111&ccb=1-7&_nc_sid=833d8c&_nc_ohc=hmoab1jKG1cQ7kNvwHbzrQw&_nc_oc=AdqKbwpNBR6F8X-J-io2jZoFK3oP438CovV1xw889KpnQZSvQg6GqowNGxfM_H18tWs&_nc_zt=23&_nc_ht=scontent.fmga3-2.fna&_nc_gid=0vSSeClSriSvPjHvGoL7qQ&_nc_ss=7b2a8&oh=00_Af-kjxWjhQwpNrySXEu8e9LZVQp4IV6q7R_U2FUN4J3nbA&oe=6A317A09", mensaje: "Nuestra propia historia mágica.", sentimiento: "Historia" },
+            26: { url: "https://scontent.fmga11-2.fna.fbcdn.net/v/t39.30808-6/719714736_122106789999352699_2137269802816727834_n.jpg?stp=cp6_dst-jpg_tt6&cstp=mx1220x2712&ctp=s1220x2712&_nc_cat=102&ccb=1-7&_nc_sid=833d8c&_nc_ohc=zqeLaOcjNQEQ7kNvwFHfDK3&_nc_oc=AdoxYKeKNEuTVz6bKTNk304KcCl5C5KpXFLL3w2qkaK0DD0MCHrg3qjUOUSZUsXfjYw&_nc_zt=23&_nc_ht=scontent.fmga11-2.fna&_nc_gid=Gx1xFnKA92unn2DUYQ6VWw&_nc_ss=7b2a8&oh=00_Af_G-qZV0FJ15o6Z_8J4gnudmL5ZDBMGUcwRDRA0iSC-Rg&oe=6A317AFB", mensaje: "Mi mayor inspiración.", sentimiento: "Inspiración" },
+            27: { url: "https://scontent.fmga3-1.fna.fbcdn.net/v/t39.30808-6/721463778_122106790047352699_5439890471039507164_n.jpg?stp=cp6_dst-jpg_tt6&cstp=mx1220x2712&ctp=s1220x2712&_nc_cat=101&ccb=1-7&_nc_sid=833d8c&_nc_ohc=8DCt3a0g4EwQ7kNvwGycvPq&_nc_oc=AdorBlsMgDJlE6qmr-4BrxLtgrisGKISY52FToDEO3YXGEqx6xG_lEA6MpKudiSs8e8&_nc_zt=23&_nc_ht=scontent.fmga3-1.fna&_nc_gid=KCyXgqFOsAKMiU44ByjfEg&_nc_ss=7b2a8&oh=00_Af_z1rcREfEqkw01pF7VGg_T-P1DeVohHE5OUF165A67_Q&oe=6A315603", mensaje: "Eres el latido de mi corazón.", sentimiento: "Latido" },
+            28: { url: "https://scontent.fmga3-1.fna.fbcdn.net/v/t39.30808-6/721348634_122106790089352699_5605931524733774070_n.jpg?stp=cp6_dst-jpg_tt6&cstp=mx1220x2712&ctp=s1220x2712&_nc_cat=100&ccb=1-7&_nc_sid=833d8c&_nc_ohc=toVyA-mT2HcQ7kNvwHBjYHY&_nc_oc=AdqnRXsiKU3FXZE4xFj8QkrQ7inG1DB5fceOLv22ufC3t47HGsaaAAZF9v5hJ4Xmb0A&_nc_zt=23&_nc_ht=scontent.fmga3-1.fna&_nc_gid=ybPHRH8OITKixb6pB9LoLA&_nc_ss=7b2a8&oh=00_Af8RxzzwWnFLdsvHVw6IjhieD87TqBAsIJsgpgS94Lwd-w&oe=6A31686A", mensaje: "Un sueño hecho realidad.", sentimiento: "Sueño" },
+            29: { url: "https://scontent.fmga3-2.fna.fbcdn.net/v/t39.30808-6/719671812_122106790137352699_6450013205908662652_n.jpg?stp=cp6_dst-jpg_tt6&cstp=mx1220x2712&ctp=s1220x2712&_nc_cat=107&ccb=1-7&_nc_sid=833d8c&_nc_ohc=Zd2a0NDN8jIQ7kNvwFt164e&_nc_oc=AdroKAQUt-APx4-dokvTzXWIYxt5FOWSGdedMzN1W9f484lOXiVj97oFg4PJWuVzu88&_nc_zt=23&_nc_ht=scontent.fmga3-2.fna&_nc_gid=ihhetlMpsq0gE7h8Tg5u-Q&_nc_ss=7b2a8&oh=00_Af81Y5pxoAGi2vVC3l8GqAIZUDYjkMAjd8op3hXfI411Iw&oe=6A3180DE", mensaje: "Un lugar para recordar y volver.", sentimiento: "Regreso" },
+            30: { url: "https://scontent.fmga3-2.fna.fbcdn.net/v/t39.30808-6/723641516_122106790179352699_4857581356277231291_n.jpg?stp=cp6_dst-jpg_tt6&cstp=mx1220x2712&ctp=s1220x2712&_nc_cat=103&ccb=1-7&_nc_sid=833d8c&_nc_ohc=VngBi_u0NrgQ7kNvwGRv1RH&_nc_oc=Adr2t4AS8F18rCDYcrTesVQhQMZjpwHCxyuGFouqOB5pUv8DvJCJBX0so_qzi0eR9RY&_nc_zt=23&_nc_ht=scontent.fmga3-2.fna&_nc_gid=h9vuVP1HBXyU5rShJDZ8hg&_nc_ss=7b2a8&oh=00_Af_mKqAT4H59tR_PJ82iBAYZWvu-Ednf9oaiKRVLJn4rOw&oe=6A316A40", mensaje: "Qué bonita coincidencia la nuestra.", sentimiento: "Coincidencia" },
+            31: { url: "https://scontent.fmga3-1.fna.fbcdn.net/v/t39.30808-6/722163494_122106790221352699_6261278056832406876_n.jpg?stp=cp6_dst-jpg_tt6&cstp=mx1220x2712&ctp=s1220x2712&_nc_cat=101&ccb=1-7&_nc_sid=833d8c&_nc_ohc=zVe66DTCNIUQ7kNvwGqXWbb&_nc_oc=Adqz-hs8OpRMAXQDpJXC06OYPqcNmjAb-kpoz76H6G6TVbL4KvoSOoygcbCcIkj8JmM&_nc_zt=23&_nc_ht=scontent.fmga3-1.fna&_nc_gid=Obv5ab03eNzPrOObM4MOzQ&_nc_ss=7b2a8&oh=00_Af8sOx3a_Dizr1X_i-MV10Y7Hvtw2merpiQdTwOe1vu22w&oe=6A317E82", mensaje: "Eres todo lo que buscaba y mucho más.", sentimiento: "Plenitud" },
+            32: { url: "https://scontent.fmga3-1.fna.fbcdn.net/v/t39.30808-6/721995525_122106790287352699_1682250691155542219_n.jpg?stp=cp6_dst-jpg_tt6&cstp=mx1220x2712&ctp=s1220x2712&_nc_cat=104&ccb=1-7&_nc_sid=833d8c&_nc_ohc=Bu5WgVqW8EMQ7kNvwHXSErC&_nc_oc=AdpNElA5rxkb9RuVTEhn6NuAL4n7I0Jgt-Y08apmxE0BI8IuD-4Begdx0ePgNPYRLDg&_nc_zt=23&_nc_ht=scontent.fmga3-1.fna&_nc_gid=i2YrjPELqmGbWW9VjvguCQ&_nc_ss=7b2a8&oh=00_Af_JRaIKzcEap2KTznOZA0HfEL8DwrggBfEco7kEn4bq0w&oe=6A3186A1", mensaje: "Una postal directo del corazón.", sentimiento: "Dulce" },
+            33: { url: "https://scontent.fmga3-1.fna.fbcdn.net/v/t39.30808-6/723197065_122106790329352699_2263414767671180766_n.jpg?stp=cp6_dst-jpg_tt6&cstp=mx1220x2712&ctp=s1220x2712&_nc_cat=108&ccb=1-7&_nc_sid=833d8c&_nc_ohc=GjkYtS4VQd0Q7kNvwFL1v6I&_nc_oc=Adp_N3iapOlu4fCkobZjUcIOqN2ykl40tumKu8eURx1aMEpPtIZkyDgiDEr1lS0N3xA&_nc_zt=23&_nc_ht=scontent.fmga3-1.fna&_nc_gid=j-SpNanDoV-awE5UFSC4Sg&_nc_ss=7b2a8&oh=00_Af9yDRomWboNYzbMv1tPLugvVIJ48qIaEJnsAVpq9CcF8w&oe=6A316CBA", mensaje: "Mi momento favorito del día, tú.", sentimiento: "Favorito" },
+            34: { url: "https://scontent.fmga3-1.fna.fbcdn.net/v/t39.30808-6/719891139_122106790383352699_8772568563634356002_n.jpg?stp=cp6_dst-jpg_tt6&cstp=mx1220x2712&ctp=s1220x2712&_nc_cat=101&ccb=1-7&_nc_sid=833d8c&_nc_ohc=cDS5T5W24aAQ7kNvwFBVgsM&_nc_oc=AdqCXYH1Ar_BSR6THHNfXdzC-OwmnfwXCVqUWVQ7LI96-PNuSjVNcgIU0JZhdZ4wpWE&_nc_zt=23&_nc_ht=scontent.fmga3-1.fna&_nc_gid=4LbvvD09dRb2NE3ZPbG1Kw&_nc_ss=7b2a8&oh=00_Af8ihhnbipzwZn-mx2C-1UG0ND9uSF1NS_tHlrBhRKzd-Q&oe=6A317858", mensaje: "De tu mano a cualquier parte.", sentimiento: "Destino" },
+            35: { url: "https://scontent.fmga11-2.fna.fbcdn.net/v/t39.30808-6/721118779_122106790431352699_2690622194160684198_n.jpg?stp=cp6_dst-jpg_tt6&cstp=mx1220x2712&ctp=s1220x2712&_nc_cat=102&ccb=1-7&_nc_sid=833d8c&_nc_ohc=7n_Iku0574oQ7kNvwEKlCHX&_nc_oc=AdqtnxQwA8X6_BejJAF8dy7yrf179rc998UwZkNgztE1HNLAY2rXBwJmKT42QZRtWcI&_nc_zt=23&_nc_ht=scontent.fmga11-2.fna&_nc_gid=S3pX1xXkL7Mf97lQZFU58w&_nc_ss=7b2a8&oh=00_Af__D5jCGXxgUqlQmhQFm09CQKELLjA_084nXBhvhQeqmw&oe=6A315D0D", mensaje: "La felicidad cabe en una fotografía.", sentimiento: "Alegría Pura" },
+            36: { url: "https://scontent.fmga11-2.fna.fbcdn.net/v/t39.30808-6/722131833_122106790473352699_3524088800838262491_n.jpg?stp=cp6_dst-jpg_tt6&cstp=mx1220x2712&ctp=s1220x2712&_nc_cat=110&ccb=1-7&_nc_sid=833d8c&_nc_ohc=VfO7fcxWIRIQ7kNvwHxaYlm&_nc_oc=AdrpEdOmnv0itI_qd522f5gN2SeNk61p0I8a0j4xMrIzpcCRkM1vRR9eo218avgyrZY&_nc_zt=23&_nc_ht=scontent.fmga11-2.fna&_nc_gid=ClGDCJNWPMPq4BpDrd_JKQ&_nc_ss=7b2a8&oh=00_Af-yLTWtnplsf3bbZKJmcifB95sPuXaAL3DsSsjbJe0ZzA&oe=6A315DDD", mensaje: "Cada día te quiero más que ayer.", sentimiento: "Crecimiento" },
+            37: { url: "https://scontent.fmga3-1.fna.fbcdn.net/v/t39.30808-6/720031184_122106790515352699_7848567133576526517_n.jpg?stp=cp6_dst-jpg_tt6&cstp=mx1220x2712&ctp=s1220x2712&_nc_cat=104&ccb=1-7&_nc_sid=833d8c&_nc_ohc=XVNz_6nHjKgQ7kNvwGcnh94&_nc_oc=AdpSbxdx1C7Fj7CQVwc4IhH8aa9M_a7BqRlY0-yeoxdXKGysXqhKy1qzAWId1o7FZ44&_nc_zt=23&_nc_ht=scontent.fmga3-1.fna&_nc_gid=g--K12e_ZjW3y6s2QpeWHA&_nc_ss=7b2a8&oh=00_Af8QLg_W1bB2Ja0JbkGY5tlr_bSuKkvHQU6d55BMNzoTFg&oe=6A3176D0", mensaje: "Siempre serás mi mayor certeza.", sentimiento: "Certeza" }
         };
 
-        // Usamos Picsum con una "semilla" para simular variedad sin sobrecargar la red con 500 descargas enormes.
-        // Cargaremos solo 25 imágenes base y las repetiremos inteligentemente en los 500 cuadros.
-        for(let i = 0; i < NUM_PHOTOS; i++) {
-            urlsFotos.push(`https://picsum.photos/seed/soyin${i % 25}/300/300`); 
+        // Reajuste automático para la expansión de la esfera
+        const recuerdosArray = Object.values(misRecuerdos);
+        const ACTUAL_NUM_PHOTOS = recuerdosArray.length;
+        
+        // ¡LA ESFERA AHORA ES MÁS AMPLIA! 
+        // Crece dinámicamente: para poquitas será pequeña, pero al tener 500 será enorme y espectacular.
+        // Mientras más fotos, más radio.
+        let ACTUAL_SPHERE_RADIUS;
+        if (ACTUAL_NUM_PHOTOS <= 20) {
+            ACTUAL_SPHERE_RADIUS = 250; 
+        } else if (ACTUAL_NUM_PHOTOS <= 100) {
+            ACTUAL_SPHERE_RADIUS = 400;
+        } else {
+            ACTUAL_SPHERE_RADIUS = 700; // Un universo gigante para cientos de fotos
         }
 
         // ==========================================
@@ -279,10 +297,10 @@
         
         const container = document.getElementById('canvas-container');
         const scene = new THREE.Scene();
-        scene.fog = new THREE.FogExp2(0x050505, 0.0015);
+        scene.fog = new THREE.FogExp2(0x050505, 0.0010); // Menos niebla para ver más lejos
 
-        const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 2000);
-        camera.position.z = 800;
+        const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 3000);
+        camera.position.z = ACTUAL_SPHERE_RADIUS + 400; // La cámara se aleja sola si la esfera crece
 
         const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
@@ -294,7 +312,7 @@
         controls.dampingFactor = 0.05;
         controls.enablePan = false;
         controls.minDistance = 100;
-        controls.maxDistance = 1000;
+        controls.maxDistance = 2000;
         // Rotación automática suave
         controls.autoRotate = true;
         controls.autoRotateSpeed = 0.5;
@@ -303,7 +321,7 @@
         const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
         scene.add(ambientLight);
         
-        const pointLight = new THREE.PointLight(0xffd700, 1, 1000);
+        const pointLight = new THREE.PointLight(0xffd700, 1, 2000);
         pointLight.position.set(0, 0, 0);
         scene.add(pointLight);
 
@@ -318,6 +336,9 @@
         // ==========================================
         
         const textureLoader = new THREE.TextureLoader();
+        // IMPORTANTE: Permitir CORS para cargar imágenes de Facebook/Dropbox en el canvas 3D
+        textureLoader.setCrossOrigin('anonymous');
+        
         const raycastObjects = []; // Arreglo para detectar colisiones (hover/click)
         
         // Geometrías para la foto y el marco
@@ -333,11 +354,36 @@
         // Material por defecto de las fotos (antes de cargar)
         const defaultPhotoMaterial = new THREE.MeshBasicMaterial({ color: 0x222222, side: THREE.DoubleSide });
 
+        // --- EFECTO MÁGICO (AURA TIERNA) PARA LOS MARCOS ---
+        function createGlowTexture() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 128; canvas.height = 128;
+            const ctx = canvas.getContext('2d');
+            const gradient = ctx.createRadialGradient(64, 64, 0, 64, 64, 64);
+            gradient.addColorStop(0, 'rgba(255, 215, 0, 0.8)');
+            gradient.addColorStop(0.4, 'rgba(255, 150, 0, 0.4)');
+            gradient.addColorStop(1, 'rgba(255, 215, 0, 0)');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, 128, 128);
+            return new THREE.CanvasTexture(canvas);
+        }
+        
+        const glowTexture = createGlowTexture();
+        const glowMaterial = new THREE.MeshBasicMaterial({
+            map: glowTexture,
+            transparent: true,
+            blending: THREE.AdditiveBlending,
+            depthWrite: false,
+            opacity: 0.6
+        });
+        const glowGeometry = new THREE.PlaneGeometry(50, 50); // Un poco más grande para sobresalir
+        const glowMeshes = [];
+
         // Distribuir puntos en una esfera usando la Espiral de Fibonacci
         const phi = Math.PI * (3 - Math.sqrt(5)); 
         
-        for (let i = 0; i < NUM_PHOTOS; i++) {
-            const y = 1 - (i / (NUM_PHOTOS - 1)) * 2; 
+        for (let i = 0; i < ACTUAL_NUM_PHOTOS; i++) {
+            const y = 1 - (i / (ACTUAL_NUM_PHOTOS - 1)) * 2; 
             const radiusAtY = Math.sqrt(1 - y * y);
             const theta = phi * i;
 
@@ -346,9 +392,9 @@
 
             // Posición final en la esfera
             const position = new THREE.Vector3(
-                x * SPHERE_RADIUS, 
-                y * SPHERE_RADIUS, 
-                z * SPHERE_RADIUS
+                x * ACTUAL_SPHERE_RADIUS, 
+                y * ACTUAL_SPHERE_RADIUS, 
+                z * ACTUAL_SPHERE_RADIUS
             );
 
             // Crear el marco
@@ -364,56 +410,85 @@
             photoMesh.position.set(0, 0, 0.5); // Local al marco
             frameMesh.add(photoMesh);
 
+            // Añadir el aura mágica detrás del marco
+            const glowMesh = new THREE.Mesh(glowGeometry, glowMaterial);
+            glowMesh.position.set(0, 0, -0.5); // Detrás del marco
+            frameMesh.add(glowMesh);
+            glowMeshes.push(glowMesh);
+
+            // Tomamos estrictamente tus fotos configuradas
+            const recuerdoPersonalizado = recuerdosArray[i]; 
+            
+            const urlFinal = recuerdoPersonalizado.url;
+            const sentimientoFinal = recuerdoPersonalizado.sentimiento;
+            const textoFinal = recuerdoPersonalizado.mensaje;
+            const tipoFinal = recuerdoPersonalizado.type || 'image';
+
             // Datos personalizados para interactividad
             frameMesh.userData = {
                 id: i,
-                url: urlsFotos[i],
-                feeling: sentimientos[Math.floor(Math.random() * sentimientos.length)],
-                defaultText: textosPredefinidos[i] || "", // Carga tu texto predefinido si existe
+                url: urlFinal,
+                type: tipoFinal,
+                feeling: sentimientoFinal,
+                defaultText: textoFinal, 
                 isHovered: false,
                 originalScale: new THREE.Vector3(1, 1, 1),
                 targetScale: new THREE.Vector3(1, 1, 1),
-                photoMesh: photoMesh // Referencia a la malla de la foto para aplicarle textura después
+                photoMesh: photoMesh 
             };
 
             imageSphereGroup.add(frameMesh);
             raycastObjects.push(frameMesh);
 
-            // Cargar textura (diferido para no congelar el navegador)
+            // Cargar textura dependiendo si es imagen o video
             setTimeout(() => {
-                textureLoader.load(urlsFotos[i], (texture) => {
-                    texture.colorSpace = THREE.SRGBColorSpace;
+                if (tipoFinal === 'video') {
+                    const video = document.createElement('video');
+                    video.src = urlFinal;
+                    video.crossOrigin = 'anonymous';
+                    video.loop = true;
+                    video.muted = true; // Mutear para que funcione como textura sin cruzar audios
+                    video.playsInline = true;
+                    video.play();
+                    
+                    const videoTexture = new THREE.VideoTexture(video);
+                    videoTexture.colorSpace = THREE.SRGBColorSpace;
                     photoMesh.material = new THREE.MeshBasicMaterial({ 
-                        map: texture,
+                        map: videoTexture,
                         side: THREE.DoubleSide
                     });
-                });
-            }, i * 15); // Stagger loading
+                } else {
+                    textureLoader.load(urlFinal, (texture) => {
+                        texture.colorSpace = THREE.SRGBColorSpace;
+                        photoMesh.material = new THREE.MeshBasicMaterial({ 
+                            map: texture,
+                            side: THREE.DoubleSide
+                        });
+                    });
+                }
+            }, i * 25); 
         }
 
         // ==========================================
         // CREACIÓN DE LAS PALABRAS FLOTANTES
         // ==========================================
         
-        // Función auxiliar para crear texturas de texto con Canvas API
         function createTextTexture(text) {
             const canvas = document.createElement('canvas');
             const ctx = canvas.getContext('2d');
             canvas.width = 512;
             canvas.height = 128;
             
-            ctx.fillStyle = 'rgba(0, 0, 0, 0)'; // Fondo transparente
+            ctx.fillStyle = 'rgba(0, 0, 0, 0)'; 
             ctx.fillRect(0, 0, canvas.width, canvas.height);
             
             ctx.font = 'bold 60px "Dancing Script", cursive';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
             
-            // Sombra/Glow
             ctx.shadowColor = '#d4af37';
             ctx.shadowBlur = 15;
             
-            // Texto dorado/blanco
             const gradient = ctx.createLinearGradient(0, 0, canvas.width, 0);
             gradient.addColorStop(0, "#ffdf00");
             gradient.addColorStop(1, "#fff");
@@ -426,8 +501,8 @@
             return texture;
         }
 
-        // Distribuir palabras en una esfera más grande
-        const WORDS_RADIUS = SPHERE_RADIUS + 150;
+        // Las palabras flotan aún más lejos de la esfera de fotos
+        const WORDS_RADIUS = ACTUAL_SPHERE_RADIUS + 200;
         for(let i = 0; i < NUM_WORDS; i++) {
             const word = palabrasUniverso[i % palabrasUniverso.length];
             const textTexture = createTextTexture(word);
@@ -438,10 +513,8 @@
             });
             const sprite = new THREE.Sprite(spriteMaterial);
             
-            // Escala del texto
             sprite.scale.set(100, 25, 1);
             
-            // Posición aleatoria esférica
             const u = Math.random();
             const v = Math.random();
             const theta = 2 * Math.PI * u;
@@ -451,7 +524,6 @@
             sprite.position.y = WORDS_RADIUS * Math.sin(phiWord) * Math.sin(theta);
             sprite.position.z = WORDS_RADIUS * Math.cos(phiWord);
             
-            // Datos para animación individual
             sprite.userData = {
                 speed: Math.random() * 0.005 + 0.001,
                 axis: new THREE.Vector3(Math.random()-0.5, Math.random()-0.5, Math.random()-0.5).normalize()
@@ -468,7 +540,7 @@
         const posArray = new Float32Array(starsCount * 3);
         
         for(let i = 0; i < starsCount * 3; i++) {
-            posArray[i] = (Math.random() - 0.5) * 2000; // Spread amplio
+            posArray[i] = (Math.random() - 0.5) * 3000; // Ampliado para cubrir más fondo
         }
         
         starsGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
@@ -484,7 +556,7 @@
         scene.add(starMesh);
 
         // ==========================================
-        // INTERACTIVIDAD (RAYCASTER)
+        // INTERACTIVIDAD Y UI
         // ==========================================
         
         const raycaster = new THREE.Raycaster();
@@ -494,56 +566,48 @@
         let hoveredObj = null;
 
         window.addEventListener('mousemove', (event) => {
-            // Actualizar posición del ratón normalizada (-1 a +1)
             mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
             mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
 
-            // Mover tooltip en CSS
             tooltip.style.left = event.clientX + 'px';
             tooltip.style.top = event.clientY + 'px';
         });
 
-        // ==========================================
-        // UI & EVENTOS DE CLIC (Detalles de fotos)
-        // ==========================================
         const detailModal = document.getElementById('detail-modal');
         const detailImage = document.getElementById('detail-image');
+        const detailVideo = document.getElementById('detail-video');
         const detailFeeling = document.getElementById('detail-feeling');
-        const detailId = document.getElementById('detail-id');
         const detailText = document.getElementById('detail-text');
         const closeBtn = document.getElementById('close-btn');
-        const saveBtn = document.querySelector('#detail-modal button'); // Botón guardar
-        const toast = document.getElementById('toast');
 
-        // ==========================================
-        // CONFIGURACIÓN DE MÚSICA
-        // ==========================================
         const musicBtn = document.getElementById('music-btn');
         const musicIcon = document.getElementById('music-icon');
         
-        // IMPORTANTE: REEMPLAZA ESTE LINK POR EL LINK DIRECTO DE TU CANCIÓN (.mp3)
-        // Puedes subir un mp3 a Dropbox, cambiar "dl=0" a "raw=1" al final del link y pegarlo aquí.
-        const bgMusic = new Audio('https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3'); 
+        // Música de fondo configurada (Bruno Mars)
+        const bgMusic = new Audio('https://dl.dropboxusercontent.com/scl/fi/jmz2t1x7rx981g626sa9h/Bruno-Mars-Risk-It-All-Lyrics.mp3?rlkey=3t5v90nhhz1drmrm9hvma8423&st=dpg150vu'); 
         bgMusic.loop = true;
-        bgMusic.volume = 0.4; // Volumen (0.0 a 1.0)
+        bgMusic.volume = 0.4;
         let isMusicPlaying = false;
 
-        musicBtn.addEventListener('click', () => {
-            if (isMusicPlaying) {
+        function toggleMusic(forcePlay) {
+            if (forcePlay || !isMusicPlaying) {
+                bgMusic.play().then(() => {
+                    isMusicPlaying = true;
+                    musicIcon.innerText = '🔊';
+                    musicBtn.innerHTML = '<span id="music-icon">🔊</span> Pausar Música';
+                }).catch(err => console.log("Autoplay bloqueado:", err));
+            } else {
                 bgMusic.pause();
+                isMusicPlaying = false;
                 musicIcon.innerText = '🔇';
                 musicBtn.innerHTML = '<span id="music-icon">🔇</span> Reproducir Música';
-            } else {
-                bgMusic.play();
-                musicIcon.innerText = '🔊';
-                musicBtn.innerHTML = '<span id="music-icon">🔊</span> Pausar Música';
             }
-            isMusicPlaying = !isMusicPlaying;
-        });
+        }
+
+        musicBtn.addEventListener('click', () => toggleMusic());
 
         window.addEventListener('click', (event) => {
-            // Si hacemos clic en paneles, ignorar lógica 3D
-            if(event.target.closest('#detail-modal') || event.target.closest('#music-btn')) return;
+            if(event.target.closest('#detail-modal') || event.target.closest('#music-btn') || event.target.closest('#start-btn')) return;
 
             raycaster.setFromCamera(mouse, camera);
             const intersects = raycaster.intersectObjects(raycastObjects);
@@ -552,24 +616,24 @@
                 const object = intersects[0].object;
                 const data = object.userData;
 
-                // Actualizar y abrir panel de detalles
-                detailImage.src = data.url;
+                if (data.type === 'video') {
+                    detailImage.classList.add('hidden');
+                    detailVideo.classList.remove('hidden');
+                    detailVideo.src = data.url;
+                    detailVideo.play();
+                } else {
+                    detailVideo.classList.add('hidden');
+                    detailVideo.pause();
+                    detailImage.classList.remove('hidden');
+                    detailImage.src = data.url;
+                }
+
                 detailFeeling.innerText = data.feeling;
-                detailId.innerText = data.id + 1;
-                
-                // Cargar texto: Prioriza lo guardado localmente, si no, usa el predefinido.
-                const savedText = localStorage.getItem('soyin_msg_' + data.id);
-                detailText.value = savedText !== null ? savedText : data.defaultText;
-                
-                // Guardar el ID en el botón para saber qué foto modificamos
-                saveBtn.dataset.currentId = data.id;
+                detailText.innerText = data.defaultText;
 
                 detailModal.classList.add('open');
-                
-                // Detener rotación automática temporalmente
                 controls.autoRotate = false;
             } else {
-                // Cerrar modal si se hace clic al vacío
                 detailModal.classList.remove('open');
                 controls.autoRotate = true;
             }
@@ -577,22 +641,8 @@
 
         closeBtn.addEventListener('click', () => {
             detailModal.classList.remove('open');
+            detailVideo.pause(); // Pausar video al cerrar
             controls.autoRotate = true;
-        });
-
-        // Evento para el botón "Guardar en el Corazón"
-        saveBtn.addEventListener('click', () => {
-            const currentId = saveBtn.dataset.currentId;
-            const currentText = detailText.value;
-            
-            // Guarda el texto en el navegador
-            localStorage.setItem('soyin_msg_' + currentId, currentText);
-            
-            // Mostrar notificación de éxito
-            toast.classList.add('show');
-            setTimeout(() => {
-                toast.classList.remove('show');
-            }, 3000); // Ocultar después de 3 segundos
         });
 
         // ==========================================
@@ -604,54 +654,52 @@
         function animate() {
             requestAnimationFrame(animate);
             
-            const delta = clock.getDelta();
             const time = clock.getElapsedTime();
-
             controls.update();
 
-            // Rotar grupo de palabras lentamente en sentido contrario
+            // Animar el aura mágica de los marcos (pulsación romántica suave)
+            const pulse = Math.sin(time * 2) * 0.1 + 1; // Crece y se achica levemente
+            const pulseOpacity = Math.sin(time * 1.5) * 0.2 + 0.6; // Su brillo parpadea
+            glowMeshes.forEach(glow => {
+                glow.scale.set(pulse, pulse, 1);
+            });
+            glowMaterial.opacity = pulseOpacity;
+
             wordsGroup.rotation.y = -time * 0.05;
             wordsGroup.rotation.z = time * 0.02;
 
-            // Animación del fondo estrellado
             starMesh.rotation.y = time * 0.01;
 
-            // Lógica de Raycasting para Hover
             raycaster.setFromCamera(mouse, camera);
             const intersects = raycaster.intersectObjects(raycastObjects);
 
-            // Restablecer el objeto anterior si ya no está en hover
             if (hoveredObj && (intersects.length === 0 || intersects[0].object !== hoveredObj)) {
                 hoveredObj.userData.targetScale.set(1, 1, 1);
-                hoveredObj.material.color.setHex(0xd4af37); // Volver al dorado normal
+                hoveredObj.material.color.setHex(0xd4af37); 
                 tooltip.classList.remove('visible');
                 document.body.style.cursor = 'default';
                 hoveredObj = null;
             }
 
-            // Aplicar efecto hover al objeto actual
             if (intersects.length > 0) {
                 const object = intersects[0].object;
                 
                 if (hoveredObj !== object) {
                     hoveredObj = object;
-                    hoveredObj.userData.targetScale.set(1.4, 1.4, 1.4); // Escalar al hacer hover
-                    hoveredObj.material.color.setHex(0xffffff); // Brillo blanco en el marco
+                    hoveredObj.userData.targetScale.set(1.4, 1.4, 1.4); 
+                    hoveredObj.material.color.setHex(0xffffff); 
                     
-                    // Actualizar tooltip
                     tooltip.innerText = object.userData.feeling;
                     tooltip.classList.add('visible');
                     document.body.style.cursor = 'pointer';
                 }
             }
 
-            // Suavizar la escala de todas las fotos (Efecto Lerp)
             for(let i=0; i<raycastObjects.length; i++) {
                 const obj = raycastObjects[i];
                 obj.scale.lerp(obj.userData.targetScale, 0.1);
             }
 
-            // Animación suave de las palabras (efecto de flotación)
             wordsGroup.children.forEach((sprite, index) => {
                 sprite.position.y += Math.sin(time * 2 + index) * 0.5;
             });
@@ -659,23 +707,36 @@
             renderer.render(scene, camera);
         }
 
-        // Manejo de redimensionamiento de ventana
         window.addEventListener('resize', () => {
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
             renderer.setSize(window.innerWidth, window.innerHeight);
         });
 
-        // Ocultar pantalla de carga una vez que inicia
         window.onload = () => {
+            // Mostrar botón para iniciar y habilitar música
             setTimeout(() => {
-                const loader = document.getElementById('loader');
-                loader.style.opacity = '0';
-                setTimeout(() => loader.remove(), 1000);
-            }, 2000); // Pequeño delay dramático para leer "Para Soyin"
+                const spinner = document.getElementById('loader-spinner');
+                const text = document.getElementById('loader-text');
+                const startBtn = document.getElementById('start-btn');
+                
+                if(spinner) spinner.style.display = 'none';
+                if(text) text.style.display = 'none';
+                if(startBtn) startBtn.classList.remove('hidden');
+            }, 2500); 
             
             animate();
         };
+
+        // Lógica del botón mágico
+        document.getElementById('start-btn').addEventListener('click', () => {
+            const loader = document.getElementById('loader');
+            loader.style.opacity = '0';
+            setTimeout(() => loader.remove(), 1000);
+            
+            // Iniciar la música automáticamente
+            toggleMusic(true);
+        });
 
     </script>
 </body>
