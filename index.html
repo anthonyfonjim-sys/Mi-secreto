@@ -746,20 +746,16 @@
           
         };
 
-        // Reajuste automático
+        // Reajuste automático para la expansión de la esfera
         const recuerdosArray = Object.values(misRecuerdos);
         const ACTUAL_NUM_PHOTOS = recuerdosArray.length;
         
-        // ¡LA ESFERA AHORA ES MÁS AMPLIA! 
-        // Crece dinámicamente: para poquitas será pequeña, pero al tener 500 será enorme y espectacular.
-        let ACTUAL_SPHERE_RADIUS;
-        if (ACTUAL_NUM_PHOTOS <= 20) {
-            ACTUAL_SPHERE_RADIUS = 250; 
-        } else if (ACTUAL_NUM_PHOTOS <= 100) {
-            ACTUAL_SPHERE_RADIUS = 400;
-        } else {
-            ACTUAL_SPHERE_RADIUS = 700; // Un MUNDO GIGANTE para cientos de fotos
-        }
+        // CÁLCULO DINÁMICO PERFECTO:
+        // Esto hace que la esfera crezca gradualmente. Las fotos siempre tendrán 
+        // el mismo espacio entre ellas sin importar si son 10, 45 o 300.
+        // El número "42" es el nivel de separación. 
+        // (Si las sientes muy separadas, bájalo a 38. Si las sientes muy pegadas, súbelo a 48).
+        let ACTUAL_SPHERE_RADIUS = Math.max(180, Math.sqrt(ACTUAL_NUM_PHOTOS) * 42);
 
         // ==========================================
         // CONFIGURACIÓN THREE.JS
