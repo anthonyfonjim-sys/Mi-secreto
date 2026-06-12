@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Universo de Soyin</title>
+    <title>Mi mundo Soyin</title>
     <!-- Tailwind CSS para la interfaz de usuario -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Fuentes de Google para un toque romántico -->
@@ -185,7 +185,7 @@
 
         <!-- Instrucciones en la parte inferior -->
         <footer class="p-4 text-center w-full bg-gradient-to-t from-black/80 to-transparent">
-            <p class="text-xs md:text-sm text-gray-400">Arrastra para rotar el universo. Toca una foto para revelar sus detalles.</p>
+            <p class="text-xs md:text-sm text-gray-400">Arrastra para rotar nuestro mundo. Toca una foto para revelar sus detalles.</p>
         </footer>
 
         <!-- Botón de Música -->
@@ -211,7 +211,7 @@
             "Infinito", "Inspiración", "Sueños", "Compañía", "Refugio", "Cariño"
         ];
 
-        const palabrasUniverso = [
+        const palabrasMundo = [
             "Soyin", "Te Amo", "Siempre", "Juntos", "Sonrisa", "Mirada", "Abrazos", "Besos",
             "Alma", "Corazón", "Vida", "Luz", "Magia", "Historia", "Nosotros", "Promesa",
             "Destino", "Estrellas", "Universo", "Infinito", "Paz", "Refugio", "Hogar",
@@ -222,10 +222,8 @@
         ];
 
         // ==========================================
-        // 🌟 TUS RECUERDOS (NUEVA LISTA COMPLETA DE FACEBOOK) 🌟
+        // 🌟 NUESTROS RECUERDOS🌟
         // ==========================================
-        // Aquí están todos los enlaces que proporcionaste. 
-        // Agregué mensajes románticos aleatorios que luego puedes cambiar si lo deseas.
         
         const misRecuerdos = {
             v1: { url: "https://dl.dropboxusercontent.com/scl/fi/y87lqq6253c85t687cp86/VID-20260610-WA0122.mp4?rlkey=p2ubbm2ouwxuaq49v9n1pdq0l&st=xn61kzyu", type: "video", mensaje: "Mi respuesta es toda las veces necesarias por que mi amor hacia ti es profundo.", sentimiento: "Sentí mucha emoción" },
@@ -288,7 +286,7 @@
         } else if (ACTUAL_NUM_PHOTOS <= 100) {
             ACTUAL_SPHERE_RADIUS = 400;
         } else {
-            ACTUAL_SPHERE_RADIUS = 700; // Un universo gigante para cientos de fotos
+            ACTUAL_SPHERE_RADIUS = 700; // Un MUNDO GIGANTE para cientos de fotos
         }
 
         // ==========================================
@@ -336,7 +334,6 @@
         // ==========================================
         
         const textureLoader = new THREE.TextureLoader();
-        // IMPORTANTE: Permitir CORS para cargar imágenes de Facebook/Dropbox en el canvas 3D
         textureLoader.setCrossOrigin('anonymous');
         
         const raycastObjects = []; // Arreglo para detectar colisiones (hover/click)
